@@ -1,0 +1,165 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+        color: rgb(0, 0, 0);
+        font-family: courier, serif;
+      }
+      p {
+          position: absolute;
+      }
+    </style>
+  </head> 
+  <body>
+    <script src="./p5/p5.min.js"></script>
+    <script>
+        var a = 1.4, b = 2.1, c=2.8, d=2.5;
+        var aSlider, bSlider, cSlider, dSlider;
+        var backgroundCol;
+        var x=1, y=1;
+
+        var xMod, yMod, xSmod, ySmod, xCmod, yCmod;
+        var opVal = ['-','-','*','*','*','*'];
+
+        var yInput,xInput, xColInput, yColInput;
+        var yInVal = 1000;
+        var xInVal = 1000;
+
+        var operators = {
+          '+': function(a,b) {return a + b},
+          '-': function(a,b) {return a - b},
+          '*': function(a,b) {return a * b},
+          '/': function(a,b) {return a / b},
+        }
+
+        function setup() {
+            aSlider = createSlider(-3,3,a,0.01);
+            bSlider = createSlider(-3,3,b,0.01);
+            cSlider = createSlider(-3,3,c,0.01);
+            dSlider = createSlider(-3,3,d,0.01);
+
+            aSlider.position(1035,50);
+            bSlider.position(1035,100);
+            cSlider.position(1035,150);
+            dSlider.position(1035,200)
+
+            backgroundCol = createColorPicker('#fffff');
+
+            backgroundCol.position(1035, 250)
+
+            xMod = createButton("Toggle X Base Operator");
+
+            yMod = createButton("Toggle Y Base Operator");
+
+            xSmod = createButton("Toggle Y Sin Operator");
+
+            ySmod = createButton('Toggle X Cos Operator');
+
+            xCmod = createButton('Toggle X Sin Operator');
+
+            yCmod = createButton('Toggle Y Cos Operator');
+
+            xMod.mousePressed(function() {toggleOperator(0)});
+            yMod.mousePressed(function() {toggleOperator(1)});
+            xSmod.mousePressed(function() {toggleOperator(2)});
+            ySmod.mousePressed(function() {toggleOperator(3)});
+            xCmod.mousePressed(function() {toggleOperator(4)});
+            yCmod.mousePressed(function() {toggleOperator(5)});
+
+            xInput = createInput(xInVal);
+            yInput = createInput(yInVal);
+
+            xInput.position(1035,300);
+            yInput.position(1035,350);
+            
+            xColInput = createInput(0);
+            yColInput = createInput(0);
+
+            xColInput.position(1035,400);
+            yColInput.position(1035,450);
+
+            var reset = createButton("Update");
+            reset.mousePressed(function() {
+                a = aSlider.value();
+                b = bSlider.value();
+                c = cSlider.value();
+                d = dSlider.value();
+                background(backgroundCol.color());
+            })
+
+            reset.position(1035, 500);
+
+            createCanvas(1000,1000);
+            background(backgroundCol.color());
+        }
+
+        function toggleOperator(target) {
+          document.getElementById(target).innerHTML = cycleOperator(opVal[target]);
+          opVal[target] = cycleOperator(opVal[target]);
+          background(backgroundCol.color());
+        }
+
+        function cycleOperator(from) {
+          switch(from) {
+            case '+':
+              return '-';
+            case '-': 
+              return '*';
+            case '*': 
+              return '/';
+            case '/':
+              return '+';
+            default:
+              return '+';
+          }
+        }
+
+        function draw() {
+            for(var i=0; i<1000; i++) {
+                var oldX = x;
+                var oldY = y;
+                x = operators[opVal[0]](sin(operators[opVal[2]](a,oldY)), cos(operators[opVal[3]](b,oldX)));
+                y = operators[opVal[1]](sin(operators[opVal[4]](c,oldX)), cos(operators[opVal[5]](d,oldY)));
+                var newX = map(x, -2,2,0,width);
+                var newY = map(y,-2,2,0,height);
+                stroke(outputColorFromCoordX(newX), outputColorFromCoordY(newY),50,80)
+                point(newX, newY);
+            }
+        }
+
+        function outputColorFromCoordX(x1) {
+            var screenX = xInput.value();
+            return (((x1-0) / (screenX-xColInput.value())) * (255-xColInput.value()) + 0);
+
+        }
+
+        function outputColorFromCoordY(y1) {
+            var screenY = yInput.value();
+            return ((y1-0) / (screenY-yColInput.value())) * (255-yColInput.value()) + 0;
+        }
+        
+    </script>
+
+    <p style='margin-top: 5px; margin-left: 1030px' >Always press update after changing these values</p>
+    <p style='margin-top: 25px; margin-left: 1030px' >A Value</p>
+    <p style='margin-top: 75px; margin-left: 1030px' >B Value</p>
+    <p style='margin-top: 125px; margin-left: 1030px' >C Value</p>
+    <p style='margin-top: 175px; margin-left: 1030px' >D Value</p>
+    <p style='margin-top: 225px; margin-left: 1030px' >Background Color</p>
+    <p style='margin-top: 280px; margin-left: 1030px' >X Color Input</p>
+    <p style='margin-top: 325px; margin-left: 1030px' >Y Color Input</p>
+    <p style='margin-top: 375px; margin-left: 1030px' >X Color Modifier</p>
+    <p style='margin-top: 425px; margin-left: 1030px' >Y Color Modifer</p>
+
+    <p style='margin-top: 1025px; margin-left: 50px' id=0 >+</p>
+    <p style='margin-top: 1025px; margin-left: 200px' id=1 >+</p>
+    <p style='margin-top: 1025px; margin-left: 350px' id=2 >*</p>
+    <p style='margin-top: 1025px; margin-left: 500px' id=3 >*</p>
+    <p style='margin-top: 1025px; margin-left: 650px' id=4 >*</p>
+    <p style='margin-top: 1025px; margin-left: 800px' id=5 >*</p>
+
+  </body>
+</html> 
